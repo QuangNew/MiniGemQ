@@ -1,0 +1,54 @@
+name: Deploy to gh-page
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-page-deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish dist to gh-page
+        run: |
+          deploy_dir="$RUNNER_TEMP/gh-page"
+          rm -rf "$deploy_dir"
+          mkdir -p "$deploy_dir"
+          cp -R dist/. "$deploy_dir/"
+          touch "$deploy_dir/.nojekyll"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git switch --orphan gh-page-deploy
+          git rm -rf . || true
+          git clean -fdx
+
+          cp -R "$deploy_dir"/. .
+          git add -A
+          git commit -m "Deploy ${GITHUB_SHA} to gh-page" || exit 0
+          git push origin HEAD:gh-page --force
