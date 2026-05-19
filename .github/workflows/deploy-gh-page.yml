@@ -1,4 +1,4 @@
-name: Deploy to gh-page
+name: Deploy website to GitHub Pages
 
 on:
   push:
@@ -7,22 +7,24 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: gh-page-deploy
-  cancel-in-progress: true
+  group: github-pages
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
@@ -30,25 +32,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build website
         run: npm run build
 
-      - name: Publish dist to gh-page
-        run: |
-          deploy_dir="$RUNNER_TEMP/gh-page"
-          rm -rf "$deploy_dir"
-          mkdir -p "$deploy_dir"
-          cp -R dist/. "$deploy_dir/"
-          touch "$deploy_dir/.nojekyll"
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
-          git switch --orphan gh-page-deploy
-          git rm -rf . || true
-          git clean -fdx
-
-          cp -R "$deploy_dir"/. .
-          git add -A
-          git commit -m "Deploy ${GITHUB_SHA} to gh-page" || exit 0
-          git push origin HEAD:gh-page --force
+    steps:
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4

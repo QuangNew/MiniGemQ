@@ -4,6 +4,10 @@ defineProps({
     type: Object,
     required: true,
   },
+  characterImage: {
+    type: String,
+    default: '',
+  },
 })
 
 defineEmits(['whack'])
@@ -29,7 +33,15 @@ defineEmits(['whack'])
 
     <span v-if="mouse.skill" class="skill-tag">{{ mouse.skill }}</span>
 
-    <svg class="mouse-art" viewBox="0 0 128 96" aria-hidden="true">
+    <img
+      v-if="characterImage"
+      class="mouse-art custom-character-art"
+      :src="characterImage"
+      alt=""
+      draggable="false"
+    />
+
+    <svg v-else class="mouse-art" viewBox="0 0 128 96" aria-hidden="true">
       <path
         class="tail"
         d="M20 66 C4 70 2 48 17 45 C30 42 31 56 21 58 C14 60 15 66 20 66"

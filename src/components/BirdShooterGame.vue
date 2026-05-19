@@ -2,6 +2,14 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Pause, Play, RotateCcw } from '@lucide/vue'
 import { birdHitLines, birdMissLines, birdTaunts, birdTypes } from '../data/brainrot'
+import { playImportedSound } from '../composables/useImportedSound'
+
+const props = defineProps({
+  assets: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 
 const GAME_LENGTH_MS = 75_000
 const SHOT_COOLDOWN_MS = 320
@@ -229,6 +237,7 @@ function shootBird(id) {
   const reward = bird.reward + combo.value * 13
   score.value += reward
   statusLine.value = `${pick(birdHitLines)} +${reward}`
+  playImportedSound(props.assets.soundUrl, 0.72)
   pushBurst(`+${reward}`, bird.x, bird.y, 'hit')
   birds.value = birds.value.filter((item) => item.id !== id)
 
@@ -369,7 +378,7 @@ onBeforeUnmount(() => {
         v-for="bird in birds"
         :key="bird.id"
         class="bird-target"
-        :class="[`bird-${bird.type}`, { 'is-left': bird.direction < 0 }]"
+        :class="[`bird-${bird.type}`, { 'is-left': bird.direction < 0, 'has-custom-art': assets.imageUrl }]"
         :style="{
           left: `${bird.x}%`,
           top: `${bird.y}%`,
@@ -382,7 +391,14 @@ onBeforeUnmount(() => {
       >
         <span class="speech-bubble">{{ bird.taunt }}</span>
         <span class="bird-label">{{ bird.label }}</span>
-        <svg class="bird-art" viewBox="0 0 112 80" aria-hidden="true">
+        <img
+          v-if="assets.imageUrl"
+          class="bird-art custom-character-art"
+          :src="assets.imageUrl"
+          alt=""
+          draggable="false"
+        />
+        <svg v-else class="bird-art" viewBox="0 0 112 80" aria-hidden="true">
           <path class="bird-wing back" d="M45 42 C18 12 8 35 34 55" />
           <path class="bird-body" d="M29 45 C42 18 82 19 94 46 C80 67 45 70 29 45" />
           <path class="bird-wing front" d="M53 43 C28 12 18 34 46 58" />

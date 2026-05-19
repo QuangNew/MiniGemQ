@@ -2,6 +2,14 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Pause, Play, RotateCcw } from '@lucide/vue'
 import { brainrotFoods, snakeStatusLines } from '../data/brainrot'
+import { playImportedSound } from '../composables/useImportedSound'
+
+const props = defineProps({
+  assets: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 
 const GRID_SIZE = 18
 const BASE_TICK_MS = 170
@@ -187,6 +195,7 @@ function eatFood(item) {
   aura.value += item.aura
   rotLevel.value = clamp(rotLevel.value + item.rot, 0, 99)
   statusLine.value = `${item.line} +${item.reward}`
+  playImportedSound(props.assets.soundUrl, 0.68)
 
   if (item.type === 'skibidi') {
     tickMs.value = Math.max(MIN_TICK_MS, tickMs.value - 10)
@@ -355,11 +364,19 @@ onBeforeUnmount(() => {
               'is-snake': cell.snakeIndex >= 0,
               'is-head': cell.isHead,
               'is-food': cell.isFood,
+              'has-custom-art': cell.isHead && assets.imageUrl,
             },
             cell.isFood ? `food-${cell.food.type}` : '',
           ]"
         >
           <span v-if="cell.isFood">{{ cell.food.label }}</span>
+          <img
+            v-else-if="cell.isHead && assets.imageUrl"
+            class="snake-custom-art"
+            :src="assets.imageUrl"
+            alt=""
+            draggable="false"
+          />
           <span v-else-if="cell.isHead" class="snake-face">
             {{ invertedTicks > 0 ? '??' : '>' }}
           </span>

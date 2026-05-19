@@ -4,6 +4,14 @@ import { Pause, Play, RotateCcw, Sparkles, Volume2, VolumeX } from '@lucide/vue'
 import RageMouse from './RageMouse.vue'
 import { hitLines, missLines, rageLines, skillLines } from '../data/ragebait'
 import { useRageAudio } from '../composables/useRageAudio'
+import { playImportedSound } from '../composables/useImportedSound'
+
+const props = defineProps({
+  assets: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 
 const GAME_LENGTH_MS = 90_000
 const ATTACK_COOLDOWN_MS = 1_000
@@ -352,7 +360,11 @@ function whackMouse(id) {
   statusLine.value = `${line} +${reward}`
   pushSplat(line.toUpperCase(), mouse.x, mouse.y, 'hit')
   mice.value = mice.value.filter((item) => item.id !== id)
-  play('hit', line)
+  if (props.assets.soundUrl) {
+    playImportedSound(props.assets.soundUrl, 0.78)
+  } else {
+    play('hit', line)
+  }
 
   if (!mice.value.length) {
     managedTimeout(() => spawnMouse(1), 520)
@@ -441,6 +453,7 @@ onBeforeUnmount(() => {
         v-for="mouse in mice"
         :key="mouse.id"
         :mouse="mouse"
+        :character-image="assets.imageUrl"
         @whack="whackMouse"
       />
 

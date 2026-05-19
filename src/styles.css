@@ -49,6 +49,16 @@ button {
   padding: 1rem;
 }
 
+.app-shell.is-fullscreen,
+.app-shell:fullscreen {
+  width: 100%;
+  height: 100svh;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(68, 209, 189, 0.12), transparent 28rem),
+    linear-gradient(135deg, #101114 0%, #17181c 48%, #12100f 100%);
+}
+
 .collection-panel,
 .game-shell {
   border: 1px solid var(--line);
@@ -145,6 +155,136 @@ button {
 .game-tile:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.custom-panel {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.panel-heading span,
+.asset-row small,
+.asset-message {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.panel-heading span {
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.panel-heading strong {
+  min-width: 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.asset-row {
+  display: grid;
+  grid-template-columns: 2.15rem minmax(0, 1fr) 2.15rem 2.15rem;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 3.55rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.45rem;
+  background: #15161a;
+}
+
+.asset-icon,
+.asset-button {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 7px;
+}
+
+.asset-icon {
+  background: rgba(244, 241, 232, 0.07);
+  color: var(--gold);
+}
+
+.asset-row span {
+  min-width: 0;
+}
+
+.asset-row strong,
+.asset-row small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-row strong {
+  color: var(--text);
+  font-size: 0.86rem;
+}
+
+.asset-button,
+.fullscreen-button {
+  border: 1px solid rgba(244, 241, 232, 0.12);
+  color: var(--text);
+  background: #191a1f;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    opacity 160ms ease;
+}
+
+.asset-button:hover,
+.fullscreen-button:hover {
+  border-color: rgba(244, 241, 232, 0.28);
+  transform: translateY(-1px);
+}
+
+.asset-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+  transform: none;
+}
+
+.fullscreen-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.65rem;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.asset-message {
+  min-height: 1.1rem;
+  margin: 0;
+  line-height: 1.25;
 }
 
 .game-shell {
@@ -312,6 +452,12 @@ h1 {
   height: 100%;
   overflow: visible;
   filter: drop-shadow(0 0.65rem 0.35rem rgba(0, 0, 0, 0.24));
+}
+
+.custom-character-art {
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
 }
 
 .tail,
@@ -593,6 +739,21 @@ h1 {
   background: linear-gradient(135deg, #f5bc4f, #ff6f5c);
 }
 
+.snake-cell.has-custom-art {
+  padding: 2px;
+  background: rgba(244, 241, 232, 0.1);
+}
+
+.snake-custom-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
 .snake-cell.is-food {
   border: 1px solid rgba(16, 17, 20, 0.28);
   box-shadow:
@@ -718,6 +879,10 @@ h1 {
   height: 100%;
   overflow: visible;
   filter: drop-shadow(0 0.55rem 0.35rem rgba(0, 0, 0, 0.24));
+}
+
+.bird-target.has-custom-art .bird-art {
+  object-fit: contain;
 }
 
 .bird-body,
@@ -914,6 +1079,10 @@ h1 {
 
   .game-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .custom-panel {
+    margin-top: 0;
   }
 }
 
